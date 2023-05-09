@@ -20,3 +20,6 @@ def paymentsForm(request):
     #if request.method == "POST":
      #    return HttpResponse("<h1> testpost </h1>")
 
+def paymentsBase(request):
+    if request.method == 'GET':
+        return HttpResponse("<h1> testpost </h1>")
