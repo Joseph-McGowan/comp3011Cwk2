@@ -20,6 +20,6 @@ from pages import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('payments/form', views.paymentsForm),
-    path('/', views.paymentsBase)
+    path('', views.paymentsBase)
 
 ]
