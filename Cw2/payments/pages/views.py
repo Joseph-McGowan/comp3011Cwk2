@@ -15,10 +15,17 @@ url = "http://127.0.0.1:8000/payments"
 @csrf_exempt
 def paymentsForm(request):
     if request.method == "GET":
-        fields = {'fields':{'cardNumber' : 'string', 'CVV': 'string'}}
+        fields = {'fields':{'Card Number' : 'string', 'CVV': 'string', 'Expiry Date' : 'date', 'Name' : 'string', 'Email' : 'string'}}
         return JsonResponse(fields)
-    #if request.method == "POST":
-     #    return HttpResponse("<h1> testpost </h1>")
+
+def paymentsPay(request):
+    if request.method == 'POST':
+        body = request.body.decode('utf-8')
+        fields = json.loads(body)
+        return JsonResponse(fields)
+
+
+
 
 def paymentsBase(request):
     if request.method == 'GET':
