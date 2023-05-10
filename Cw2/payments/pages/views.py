@@ -35,7 +35,7 @@ def paymentsPay(request):
 
         success = 1
         if success:
-            
+            print('success')
 
 
         return JsonResponse({'request' : 'success'})
