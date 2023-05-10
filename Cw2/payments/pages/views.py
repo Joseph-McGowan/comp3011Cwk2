@@ -39,15 +39,15 @@ def paymentsPay(request):
         nameRegex = re.compile(r"[A-Z)][a-zA-Z]*")
         emailRegEx = re.compile(r"[a-zA-Z0-9]+@[a-zA-Z0-9]+\.[a-z]+")
 
-        if re.fullmatch(cardNumRegEx, cardNumber):
+        if not(re.fullmatch(cardNumRegEx, cardNumber)):
             return HttpResponseBadRequest('Malformed Card Number, payment failed', status = 405)
-        if re.fullmatch(cvvRegEx, cvv):
+        if not(re.fullmatch(cvvRegEx, cvv)):
             return HttpResponseBadRequest('Malformed CVV, payment failed', status = 405)
-        if re.fullmatch(expiryDateRegEx, expiryDate):
+        if not(re.fullmatch(expiryDateRegEx, expiryDate)):
             return HttpResponseBadRequest('Malformed Expiry Date, payment failed', status = 405)
-        if re.fullmatch(nameRegex, name):
+        if not(re.fullmatch(nameRegex, name)):
             return HttpResponseBadRequest('Invalid Name, payment failed', status = 405)
-        if re.fullmatch(emailRegEx, email):
+        if not(re.fullmatch(emailRegEx, email)):
             return HttpResponseBadRequest('Inavlid email, payment failed', status = 405)
 
         
