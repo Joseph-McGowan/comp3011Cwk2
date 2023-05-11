@@ -21,6 +21,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('payments/form', views.paymentsForm),
     path('payments/pay', views.paymentsPay),
+    path('payments/refund', views.paymentsRefund),
     path('', views.paymentsBase)
 
 ]
