@@ -24,7 +24,7 @@ class billingDetails(models.Model):
     userEmail = models.EmailField()
 
 class transactions(models.Model):
-    tUserId = models.ForeignKey()
+    tUserId = models.ForeignKey("billingDetails", on_delete= models.CASCADE)
     tDate = models.DateField()
     tAmount = models.FloatField()
     tCurrencyID = models.ForeignKey("creditCard", on_delete= models.CASCADE)
