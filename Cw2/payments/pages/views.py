@@ -4,7 +4,7 @@ from django.views.decorators.csrf import csrf_exempt
 import requests 
 import json
 import re
-from payments.pages.models import creditCard, billingDetails, transactions, Currencies
+from pages.models import creditCard, billingDetails, transactions, Currencies
 from datetime import date
 
 # Create your views here.
