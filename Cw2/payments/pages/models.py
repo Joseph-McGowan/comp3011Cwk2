@@ -10,8 +10,8 @@ class creditCard(models.Model):
     cardSalt = models.CharField()
     cardUserName = models.CharField()
     cardBalance = models.DecimalField(decimal_places= 2)
-    cardCurrencyId = models.ForeignKey('Currencies')
-    cardBillingId = models.ForeignKey('billingDetails')
+    cardCurrencyId = models.ForeignKey('Currencies', on_delete= models.CASCADE)
+    cardBillingId = models.ForeignKey('billingDetails', on_delete= models.CASCADE)
 
 class billingDetails(models.Model):
     userId = models.AutoField(primary_key= True)
@@ -27,7 +27,7 @@ class transactions(models.Model):
     tUserId = models.ForeignKey()
     tDate = models.DateField()
     tAmount = models.FloatField()
-    tCurrencyID = models.ForeignKey("creditCard")
+    tCurrencyID = models.ForeignKey("creditCard", on_delete= models.CASCADE)
     tTransactionFee = models.FloatField()
     tConfirmed = models.BooleanField()
     tRecipAccountId = models.IntegerField()
