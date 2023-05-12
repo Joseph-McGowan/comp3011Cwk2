@@ -26,199 +26,213 @@ def paymentsForm(request):
 
 @csrf_exempt 
 def paymentsPay(request):
-    if request.method == "POST":
-        #print(request.POST)
-        #for items in request.POST.items():
-        #    print(items)
-       
-        try:    
-            payload = json.loads(request.body)
-            formData = payload.get("fields")
-            transactionData = payload.get("transaction")
+    try:
 
-            requestCardNumber = formData.get("cardNumber")
-            cvv = formData.get("cvv")
-            expiryDate = formData.get("expiryDate")
-            name = formData.get("name")
-            email = formData.get("email")
-
-            rAmount = transactionData.get("amount")
-            rCurrency = transactionData.get("currency")
-            rRecipAccount = transactionData.get("recipientAccount")
-            rBookingId = transactionData.get("bookingID")
-
-        except json.JSONDecodeError:
-            return HttpResponseBadRequest("invalid json data")
-        #Parse request data
-
-
-        #Check input data is formed correctly
-
-        cardNumRegEx = re.compile(r"[0-9]{16}")
-        cvvRegEx = re.compile(r"[0-9]{3}")
-        expiryDateRegEx = re.compile(r"[0-9]{2}\/[0-9]{2}")
-        nameRegex = re.compile(r"[A-Z)][a-zA-Z]*")
-        emailRegEx = re.compile(r"[a-zA-Z0-9]+@[a-zA-Z0-9]+\.[a-z]+")
-
-        if not(re.fullmatch(cardNumRegEx, requestCardNumber)):
-            return JsonResponse('Malformed Card Number, payment failed', status = 405)
-        if not(re.fullmatch(cvvRegEx, cvv)):
-            return  JsonResponse('Malformed CVV, payment failed', status = 405)
-        if not(re.fullmatch(expiryDateRegEx, expiryDate)):
-            return  JsonResponse('Malformed Expiry Date, payment failed', status = 405)
-        if not(re.fullmatch(nameRegex, name)):
-            return  JsonResponse('Invalid Name, payment failed', status = 405)
-        if not(re.fullmatch(emailRegEx, email)):
-            return  JsonResponse('Inavlid email, payment failed', status = 405)
-
-        #query database for card matching form data
+        if request.method == "POST":
+            #print(request.POST)
+            #for items in request.POST.items():
+            #    print(items)
         
-        transactionCard = creditCard.objects.get(cardNumber = requestCardNumber)
-        cardExists = creditCard.objects.filter(cardNumber = requestCardNumber).exists()
+            try:    
+                payload = json.loads(request.body)
+                formData = payload.get("fields")
+                transactionData = payload.get("transaction")
 
-          #transactionCard = creditCard.objects.get(cardNumber = requestCardNumber)
+                requestCardNumber = formData.get("cardNumber")
+                cvv = formData.get("cvv")
+                expiryDate = formData.get("expiryDate")
+                name = formData.get("name")
+                email = formData.get("email")
 
-        if not(cardExists):
-            return JsonResponse('status : failed', "message : card Doesn't exist")
+                rAmount = transactionData.get("amount")
+                rCurrency = transactionData.get("currency")
+                rRecipAccount = transactionData.get("recipientAccount")
+                rBookingId = transactionData.get("bookingID")
 
-        #check other card details
-        if cvv != transactionCard.cardCVV:
-            return JsonResponse('status : failed')
-        if expiryDate != transactionCard.cardExpiryDate:
-            return JsonResponse('status : failed')
-        if name != transactionCard.cardUserName:
-            return JsonResponse('status : failed')
+            except json.JSONDecodeError:
+                return HttpResponseBadRequest("invalid json data")
+            #Parse request data
 
-        #access users billing details through foreign key relation
-        tBillingDetails = transactionCard.cardBillingId
 
-        #check whether currency needs to be converted before making payment reqeust
-        if transactionCard.cardCurrencyId != rCurrency:
-            AmountPreConversion = rAmount
-            response = requests.get(url+'/exchange/'+rCurrency+'/'+str(AmountPreConversion))
+            #Check input data is formed correctly
+
+            cardNumRegEx = re.compile(r"[0-9]{16}")
+            cvvRegEx = re.compile(r"[0-9]{3}")
+            expiryDateRegEx = re.compile(r"[0-9]{2}\/[0-9]{2}")
+            nameRegex = re.compile(r"[A-Z)][a-zA-Z]*")
+            emailRegEx = re.compile(r"[a-zA-Z0-9]+@[a-zA-Z0-9]+\.[a-z]+")
+
+            if not(re.fullmatch(cardNumRegEx, requestCardNumber)):
+                return JsonResponse('Malformed Card Number, payment failed', status = 405)
+            if not(re.fullmatch(cvvRegEx, cvv)):
+                return  JsonResponse('Malformed CVV, payment failed', status = 405)
+            if not(re.fullmatch(expiryDateRegEx, expiryDate)):
+                return  JsonResponse('Malformed Expiry Date, payment failed', status = 405)
+            if not(re.fullmatch(nameRegex, name)):
+                return  JsonResponse('Invalid Name, payment failed', status = 405)
+            if not(re.fullmatch(emailRegEx, email)):
+                return  JsonResponse('Inavlid email, payment failed', status = 405)
+
+            #query database for card matching form data
+            
+            transactionCard = creditCard.objects.get(cardNumber = requestCardNumber)
+            cardExists = creditCard.objects.filter(cardNumber = requestCardNumber).exists()
+
+            #transactionCard = creditCard.objects.get(cardNumber = requestCardNumber)
+
+            if not(cardExists):
+                return JsonResponse('status : failed', "message : card Doesn't exist")
+
+            #check other card details
+            if cvv != transactionCard.cardCVV:
+                return JsonResponse('status : failed')
+            if expiryDate != transactionCard.cardExpiryDate:
+                return JsonResponse('status : failed')
+            if name != transactionCard.cardUserName:
+                return JsonResponse('status : failed')
+
+            #access users billing details through foreign key relation
+            tBillingDetails = transactionCard.cardBillingId
+
+            #check whether currency needs to be converted before making payment reqeust
+            if transactionCard.cardCurrencyId != rCurrency:
+                AmountPreConversion = rAmount
+                response = requests.get(url+'/exchange/'+rCurrency+'/'+str(AmountPreConversion))
+                data = response.json()
+                rAmount = data.get("convertedAmount") 
+
+            #check user has enough in acccount for transaction (inlcudind transaction fee)
+            if rAmount > balanceToUpdate:
+                data = {"status" : "failure"}
+                return JsonResponse(data)
+
+            #relevant data for bank api
+            data = {'amount' : rAmount, 'companyName' : rRecipAccount, 'bookingID' : rBookingId}
+
+            #send post request to bank api to make paument to airline
+            response = requests.post(url+'/pay', json= data)
+
             data = response.json()
-            rAmount = data.get("convertedAmount") 
 
-        #check user has enough in acccount for transaction (inlcudind transaction fee)
+            
+            if response.status_code == 200:
+                #we have successfully taken the payment
+                
+                #Take off amount from users balance
+                balanceToUpdate = Decimal(transactionCard.cardBalance) 
+                balanceToUpdate -= (Decimal(rAmount) + Decimal(50.00))
+                transactionCard.cardBalance = balanceToUpdate
+                transactionCard.save()
+                
+                #Create new instance of transaction
+                transaction = transactions()
+                transaction.tUserId = tBillingDetails
+                transaction.tDate = date.today()
+                transaction.tAmount = rAmount
+                transaction.tCurrencyID = Currencies.objects.get(cSymbol = rCurrency)
+                transaction.tTransactionFee = 50.00
+                transaction.tConfirmed = True
+                transaction.tRecipAccountId = rRecipAccount
+                transaction.save()
 
-        #update users card balance
-        balanceToUpdate = Decimal(transactionCard.cardBalance) 
-        balanceToUpdate-= (Decimal(rAmount) + Decimal(50.00))
-        transactionCard.cardBalance = balanceToUpdate
-        transactionCard.save()
+                data = {
+                    'status' : "success",
+                    'TransactionID' : str(transaction.id)
+                }
+                return JsonResponse(data)
 
-        #relevant data for bank api
-        data = {'amount' : rAmount, 'companyName' : rRecipAccount, 'bookingID' : rBookingId}
-        #json.dumps()
-
-        #send post request to bank api to make paument to airline
-        response = requests.post(url+'/pay', json= data)
-
-        #return JsonResponse(response, safe=False)
-
-        #tCurrency 
-
-        if response.status_code == 200:
-            #successful
-            #send email
-            #Create a transaction
-            transaction = transactions()
-            transaction.tUserId = tBillingDetails
-            transaction.tDate = date.today()
-            transaction.tAmount = rAmount
-            transaction.tCurrencyID = Currencies.objects.get(cSymbol = rCurrency)
-            transaction.tTransactionFee = 50.00
-            transaction.tConfirmed = True
-            transaction.tRecipAccountId = rRecipAccount
-            transaction.save()
-
-            data = {
-                'status' : "success",
-                'TransactionID' : str(transaction.id)
-            }
-            return JsonResponse(data)
-
-        else:
-            data = {
-                'status' : 'failed'            
-            }
-            return JsonResponse(data)
+            else:
+                data = {
+                    'status' : 'failed'            
+                }
+                return JsonResponse(data)
+    except:
+        data = {"status" : "failed"}
+        return JsonResponse(data)
 
 @csrf_exempt
 def paymentsRefund(request):
-    if request.method == 'POST':
+    try:
 
-        #parse bank details
+        if request.method == 'POST':
 
-        try:    
-            payload = json.loads(request.body)
-            formData = payload.get("fields")
-            #transactionData = payload.get("transaction")
+            #parse bank details
 
-            requestCardNumber = formData.get("cardNumber")
-            cvv = formData.get("cvv")
-            expiryDate = formData.get("expiryDate")
-            name = formData.get("name")
-            email = formData.get("email")
+            try:    
+                payload = json.loads(request.body)
+                formData = payload.get("fields")
+                #transactionData = payload.get("transaction")
 
-            rTransaction = payload.get("TransactionID")
-            rReservation = payload.get("BookingID")
-            #rCurrency = transactionData.get("currency")
+                requestCardNumber = formData.get("cardNumber")
+                cvv = formData.get("cvv")
+                expiryDate = formData.get("expiryDate")
+                name = formData.get("name")
+                email = formData.get("email")
 
-        except json.JSONDecodeError:
-            return HttpResponseBadRequest("invalid json data")
+                rTransaction = payload.get("TransactionID")
+                rReservation = payload.get("BookingID")
+                #rCurrency = transactionData.get("currency")
 
-        #query database for card in request
-       
-        cardExists = creditCard.objects.filter(cardNumber = requestCardNumber).exists()
+            except json.JSONDecodeError:
+                return HttpResponseBadRequest("invalid json data")
 
-        if not(cardExists):
-            data = {'status' : 'failed' }
+            #query database for card in request
+        
+            cardExists = creditCard.objects.filter(cardNumber = requestCardNumber).exists()
+
+            if not(cardExists):
+                data = {'status' : 'failed' }
+                return JsonResponse(data)
+            
+            transactionCard = creditCard.objects.get(cardNumber = requestCardNumber)
+
+            
+            #check other card details match
+            if cvv != transactionCard.cardCVV:
+                return JsonResponse('status : failed')
+            if expiryDate != transactionCard.cardExpiryDate:
+                return JsonResponse('status : failed')
+            if name != transactionCard.cardUserName:
+                return JsonResponse('status : failed')
+
+            rBillingDetails = transactionCard.cardBillingId
+
+            rTransactionDB = transactions.objects.get(id = rTransaction)
+
+            transactionUser = rTransactionDB.tUserId
+
+            #Make sure person making request made original transaction
+            if transactionUser.userFirstName != rBillingDetails.userFirstName:
+                return JsonResponse("error : transaction made under different user")
+            
+            currencyID = rTransactionDB.tCurrencyID
+
+
+            data = {'bookingID' : rReservation }
+            
+
+            #send refund post request to bank
+            response = requests.post(url+'/refund', json = data)
+            #return JsonResponse(response.json)
+
+            if response.status_code == 200:
+                
+                #Refund money to recip account
+                balanceToUpdate = Decimal(transactionCard.cardBalance) 
+                balanceToUpdate +=  Decimal(rTransactionDB.tAmount)
+                transactionCard.cardBalance = balanceToUpdate
+            
+                transactionCard.save()
+
+                rTransactionDB.delete()
+                data = {'status' : 'success'}
+                return JsonResponse(data)
+
+            data = {'status' : 'failed'}
             return JsonResponse(data)
         
-        transactionCard = creditCard.objects.get(cardNumber = requestCardNumber)
-
-        
-        #check other card details match
-        if cvv != transactionCard.cardCVV:
-            return JsonResponse('status : failed')
-        if expiryDate != transactionCard.cardExpiryDate:
-            return JsonResponse('status : failed')
-        if name != transactionCard.cardUserName:
-            return JsonResponse('status : failed')
-
-        rBillingDetails = transactionCard.cardBillingId
-
-        rTransactionDB = transactions.objects.get(id = rTransaction)
-
-        transactionUser = rTransactionDB.tUserId
-
-        #Make sure person making request made original transaction
-        if transactionUser.userFirstName != rBillingDetails.userFirstName:
-            return JsonResponse("error : transaction made under different user")
-        
-        #Refund money to recip account
-        balanceToUpdate = Decimal(transactionCard.cardBalance) 
-        balanceToUpdate +=  Decimal(rTransactionDB.tAmount)
-        transactionCard.cardBalance = balanceToUpdate
-        
-        transactionCard.save()
-
-        currencyID = rTransactionDB.tCurrencyID
-
-
-        data = {'bookingID' : rReservation }
-        
-
-        #send refund post request to bank
-        response = requests.post(url+'/refund', json = data)
-        #return JsonResponse(response.json)
-
-        if response.status_code == 200:
-            data = {'status' : 'success'}
-            return JsonResponse(data)
-
-        data = {'status' : 'failed'}
+    except:
+        data = {"status" : "failed" }
         return JsonResponse(data)
 
 def paymentsBase(request):
