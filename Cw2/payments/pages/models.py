@@ -30,7 +30,7 @@ class transactions(models.Model):
     tCurrencyID = models.ForeignKey("Currencies", on_delete= models.CASCADE)
     tTransactionFee = models.FloatField()
     tConfirmed = models.BooleanField()
-    tRecipAccountId = models.IntegerField()
+    tRecipAccountId = models.CharField(max_length=50)
 
 
 class Currencies(models.Model):
