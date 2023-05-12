@@ -190,7 +190,7 @@ def paymentsRefund(request):
         currencyID = rTransactionDB.tCurrencyID
 
 
-        data = {'bookingId' : rReservation }
+        data = {'bookingID' : rReservation }
         
 
         #send refund post request to bank
@@ -200,7 +200,7 @@ def paymentsRefund(request):
             return JsonResponse('Status : success')
 
 
-        return JsonResponse('status : error')
+        return JsonResponse('Status : error')
 
 def paymentsBase(request):
     if request.method == 'GET':
