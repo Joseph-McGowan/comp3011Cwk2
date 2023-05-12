@@ -113,7 +113,7 @@ def paymentsPay(request):
         #send post request to bank api to make paument to airline
         response = requests.post(url+'/pay', json= data)
 
-        return JsonResponse(response)
+        return JsonResponse(response, safe=False)
 
         #tCurrency 
 
