@@ -50,19 +50,6 @@ def paymentsPay(request):
             return HttpResponseBadRequest("invalid json data")
         #Parse request data
 
-       
-
-        #requestCardNumber = request.POST['cardNumber']
-        #cvv = request.POST['cvv']
-        #expiryDate = request.POST['expiryDate']
-        #name = request.POST['name']
-        #email = request.POST['email']
-
-        #rAmount = request.POST.get('amount')
-        #rCurrency = request.POST['currency']
-        #rRecipAccount = request.POST['recipientAccount']
-        #rReservationId = request.POST['reservationId']
-
         #Check input data is formed correctly
 
         cardNumRegEx = re.compile(r"[0-9]{16}")
@@ -127,7 +114,7 @@ def paymentsPay(request):
             transaction.tDate = date.today()
             transaction.tAmount = rAmount
             transaction.tCurrencyID = rCurrency
-            transaction.tTransactionFee = 50
+            transaction.tTransactionFee = 50.00
             transaction.tConfirmed = True
             transaction.tRecipAccountId = rRecipAccount
             transaction.save()
@@ -142,14 +129,33 @@ def paymentsRefund(request):
     if request.method == 'POST':
 
         #parse bank details
-        requestCardNumber = request.POST['cardNumber']
-        cvv = request.POST['cvv']
-        expiryDate = request.POST['expiryDate']
-        name = request.POST['name']
-        email = request.POST['email']
 
-        rTransaction = request.POST['transactionId']
-        rReservation = request.POST['reservationId']
+        try:    
+            payload = json.loads(request.body)
+            formData = payload.get("fields")
+            transactionData = payload.get("transaction")
+
+            requestCardNumber = formData.get("cardNumber")
+            cvv = formData.get("cvv")
+            expiryDate = formData.get("expiryDate")
+            name = formData.get("name")
+            email = formData.get("email")
+
+            rTransaction = transactionData.get("transactionId")
+            rReservation = transactionData.get("reservationId")
+
+        except json.JSONDecodeError:
+            return HttpResponseBadRequest("invalid json data")
+
+
+        # requestCardNumber = request.POST['cardNumber']
+        # cvv = request.POST['cvv']
+        # expiryDate = request.POST['expiryDate']
+        # name = request.POST['name']
+        # email = request.POST['email']
+
+        # rTransaction = request.POST['transactionId']
+        # rReservation = request.POST['reservationId']
 
         #query database for card in request
         transactionCard = creditCard.objects.get(cardNumber = requestCardNumber)
