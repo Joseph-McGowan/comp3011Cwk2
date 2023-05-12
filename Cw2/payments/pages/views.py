@@ -38,7 +38,7 @@ def paymentsPay(request):
         name = request.POST['name']
         email = request.POST['email']
 
-        rAmount = request.POST['amount']
+        rAmount = request.POST.get('amount')
         rCurrency = request.POST['currency']
         rRecipAccount = request.POST['recipientAccount']
         rReservationId = request.POST['reservationId']
