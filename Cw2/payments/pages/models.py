@@ -27,7 +27,7 @@ class transactions(models.Model):
     tUserId = models.ForeignKey("billingDetails", on_delete= models.CASCADE)
     tDate = models.DateField()
     tAmount = models.FloatField()
-    tCurrencyID = models.ForeignKey("creditCard", on_delete= models.CASCADE)
+    tCurrencyID = models.ForeignKey("Currencies", on_delete= models.CASCADE)
     tTransactionFee = models.FloatField()
     tConfirmed = models.BooleanField()
     tRecipAccountId = models.IntegerField()
