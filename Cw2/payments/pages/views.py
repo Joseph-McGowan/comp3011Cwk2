@@ -18,7 +18,7 @@ url = "https://sc19jt.pythonanywhere.com/bank"
 @csrf_exempt
 def paymentsForm(request):
     if request.method == "GET":
-        fields = {'fields':{'cardNumber' : 'string', 'CVV': 'string', 'expiryDate' : 'string', 'name' : 'string', 'email' : 'string'}}
+        fields = {'fields':{'cardNumber' : '16 digit card number', 'cvv': '3 digit CVV', 'expiryDate' : 'MM/YY', 'name' : 'John', 'email' : 'johndoe@gmail.com'}}
         return JsonResponse(fields)
 
 
@@ -32,12 +32,12 @@ def paymentsPay(request):
         #Parse request data
 
         requestCardNumber = request.POST['cardNumber']
-        cvv = request.POST['CVV']
+        cvv = request.POST['cvv']
         expiryDate = request.POST['expiryDate']
         name = request.POST['name']
         email = request.POST['email']
 
-        rAmmount = request.POST['amount']
+        rAmount = request.POST['amount']
         rCurrency = request.POST['currency']
         rRecipAccount = request.POST['recipientAccount']
         rReservationId = request.POST['reservationId']
@@ -82,15 +82,15 @@ def paymentsPay(request):
 
         #check whether currency needs to be converted before making payment reqeust
         if transactionCard.cardCurrencyId != rCurrency:
-            ammountPreConversion = rAmmount
-            rAmmount = requests.get(url+'/exchange/'+rCurrency+'/'+ammountPreConversion)
+            AmountPreConversion = rAmount
+            rAmount = requests.get(url+'/exchange/'+rCurrency+'/'+AmountPreConversion)
 
         #update users card balance
-        transactionCard.cardBalance -= rAmmount
+        transactionCard.cardBalance -= rAmount
         transactionCard.save()
 
         #relevant data for bank api
-        data = {'transaction' : {'amount' : rAmmount, 'currency' : rCurrency, 'recipientAccount' : rRecipAccount, 'reservationId' : rReservationId} }
+        data = {'transaction' : {'amount' : rAmount, 'currency' : rCurrency, 'recipientAccount' : rRecipAccount, 'reservationId' : rReservationId} }
 
         #send post request to bank api to make paument to airline
         response = requests.post(url+'/pay', data= data)
@@ -102,7 +102,7 @@ def paymentsPay(request):
             transaction = transactions()
             transaction.tUserId = tBillingDetails.userId
             transaction.tDate = date.today()
-            transaction.tAmount = rAmmount
+            transaction.tAmount = rAmount
             transaction.tCurrencyID = rCurrency
             transaction.tTransactionFee = "50"
             transaction.tConfirmed = True
@@ -117,7 +117,59 @@ def paymentsPay(request):
 
 def paymentsRefund(request):
     if request.method == 'POST':
-        return JsonResponse('status : success')
+
+        #parse bank details
+        requestCardNumber = request.POST['cardNumber']
+        cvv = request.POST['cvv']
+        expiryDate = request.POST['expiryDate']
+        name = request.POST['name']
+        email = request.POST['email']
+
+        rTransaction = request.POST['transactionId']
+        rReservation = request.POST['reservationId']
+
+        #query database for card in request
+        transactionCard = creditCard.objects.get(cardNumber = requestCardNumber)
+        cardExists = creditCard.objects.get(cardNumber = requestCardNumber).exists()
+
+        if not(cardExists):
+            return JsonResponse('status : failed', "message : card Doesn't exist")
+        
+        #check other card details match
+        if cvv != transactionCard.cardCVV:
+            return JsonResponse('status : failed')
+        if expiryDate != transactionCard.cardExpiryDate:
+            return JsonResponse('status : failed')
+        if name != transactionCard.cardUserName:
+            return JsonResponse('status : failed')
+
+        rBillingDetails = transactionCard.cardBillingId
+
+        rTransactionDB = transactions.objects.get(id = rReservation)
+
+        transactionUser = rTransactionDB.tUserId
+
+        #Make sure person making request made original transaction
+        if transactionUser.userFirstName != rBillingDetails.userFirstName:
+            return JsonResponse("error : transaction made under different user")
+        
+        #Refund money to recip account
+        transactionCard.cardBalance += rTransactionDB.tAmount
+
+        currencyID = rTransactionDB.tCurrencyID
+
+
+        data = {'transactionId' : rTransaction, 'reservationId' : rReservation }
+        
+
+        #send refund post request to bank
+        response = requests.post(url+'/refund', data = data)
+
+        if response.status_code == 200:
+            return JsonResponse('Status : success')
+
+
+        return JsonResponse('status : error')
 
 def paymentsBase(request):
     if request.method == 'GET':
