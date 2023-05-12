@@ -93,9 +93,11 @@ def paymentsPay(request):
          #   AmountPreConversion = rAmount
           #  rAmount = requests.get(url+'/exchange/'+rCurrency+'/'+str(AmountPreConversion))
 
+        #check user has enough in acccount for transaction (inlcudind transaction fee)
+
         #update users card balance
         balanceToUpdate = Decimal(transactionCard.cardBalance) 
-        balanceToUpdate-= Decimal(rAmount)
+        balanceToUpdate-= (Decimal(rAmount) + 50.00)
         transactionCard.cardBalance = balanceToUpdate
         transactionCard.save()
 
@@ -147,16 +149,6 @@ def paymentsRefund(request):
         except json.JSONDecodeError:
             return HttpResponseBadRequest("invalid json data")
 
-
-        # requestCardNumber = request.POST['cardNumber']
-        # cvv = request.POST['cvv']
-        # expiryDate = request.POST['expiryDate']
-        # name = request.POST['name']
-        # email = request.POST['email']
-
-        # rTransaction = request.POST['transactionId']
-        # rReservation = request.POST['reservationId']
-
         #query database for card in request
         transactionCard = creditCard.objects.get(cardNumber = requestCardNumber)
         cardExists = creditCard.objects.filter(cardNumber = requestCardNumber).exists()
@@ -192,7 +184,7 @@ def paymentsRefund(request):
         currencyID = rTransactionDB.tCurrencyID
 
 
-        data = {'transactionId' : rTransaction, 'reservationId' : rReservation }
+        data = {'bookingId' : rReservation }
         
 
         #send refund post request to bank
