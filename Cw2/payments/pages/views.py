@@ -26,9 +26,9 @@ def paymentsForm(request):
 @csrf_exempt 
 def paymentsPay(request):
     if request.method == "POST":
-        print(request.POST)
-        for items in request.POST.items():
-            print(items)
+        #print(request.POST)
+        #for items in request.POST.items():
+        #    print(items)
        
         try:    
             payload = json.loads(request.body)
