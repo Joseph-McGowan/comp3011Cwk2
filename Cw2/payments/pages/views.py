@@ -102,7 +102,7 @@ def paymentsPay(request):
         #check whether currency needs to be converted before making payment reqeust
         if transactionCard.cardCurrencyId != rCurrency:
             AmountPreConversion = rAmount
-            rAmount = requests.get(url+'/exchange/'+rCurrency+'/'+AmountPreConversion)
+            rAmount = requests.get(url+'/exchange/'+rCurrency+'/'+str(AmountPreConversion))
 
         #update users card balance
         balanceToUpdate = Decimal(transactionCard.cardBalance) 
@@ -125,7 +125,7 @@ def paymentsPay(request):
             transaction.tDate = date.today()
             transaction.tAmount = rAmount
             transaction.tCurrencyID = rCurrency
-            transaction.tTransactionFee = "50"
+            transaction.tTransactionFee = 50
             transaction.tConfirmed = True
             transaction.tRecipAccountId = rRecipAccount
             transaction.save()
