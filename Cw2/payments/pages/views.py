@@ -75,6 +75,8 @@ def paymentsPay(request):
         transactionCard = creditCard.objects.get(cardNumber = requestCardNumber)
         cardExists = creditCard.objects.filter(cardNumber = requestCardNumber).exists()
 
+          #transactionCard = creditCard.objects.get(cardNumber = requestCardNumber)
+
         if not(cardExists):
             return JsonResponse('status : failed', "message : card Doesn't exist")
 
