@@ -156,8 +156,8 @@ def paymentsRefund(request):
             name = formData.get("name")
             email = formData.get("email")
 
-            rTransaction = transactionData.get("transactionId")
-            rReservation = transactionData.get("bookingId")
+            rTransaction = transactionData.get("TransactionID")
+            rReservation = transactionData.get("BookingID")
             #rCurrency = transactionData.get("currency")
 
         except json.JSONDecodeError:
