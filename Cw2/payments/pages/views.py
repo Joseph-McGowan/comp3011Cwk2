@@ -148,7 +148,7 @@ def paymentsRefund(request):
         try:    
             payload = json.loads(request.body)
             formData = payload.get("fields")
-            transactionData = payload.get("transaction")
+            #transactionData = payload.get("transaction")
 
             requestCardNumber = formData.get("cardNumber")
             cvv = formData.get("cvv")
@@ -156,8 +156,8 @@ def paymentsRefund(request):
             name = formData.get("name")
             email = formData.get("email")
 
-            rTransaction = transactionData.get("TransactionID")
-            rReservation = transactionData.get("BookingID")
+            rTransaction = payload.get("TransactionID")
+            rReservation = payload.get("BookingID")
             #rCurrency = transactionData.get("currency")
 
         except json.JSONDecodeError:
