@@ -13,7 +13,7 @@ from decimal import Decimal
 def index(request):
     return HttpResponse("<h1> test </h1>")
 
-url = "https://sc19jt.pythonanywhere.com/bank"
+url = "https://sc20wrpf.pythonanywhere.com/bank"
 #response = requests.get(url)
 
 @csrf_exempt
