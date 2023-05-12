@@ -120,7 +120,7 @@ def paymentsPay(request):
             transaction.tUserId = tBillingDetails
             transaction.tDate = date.today()
             transaction.tAmount = rAmount
-            transaction.tCurrencyID = rCurrency
+            transaction.tCurrencyID = 1
             transaction.tTransactionFee = 50.00
             transaction.tConfirmed = True
             transaction.tRecipAccountId = rRecipAccount
