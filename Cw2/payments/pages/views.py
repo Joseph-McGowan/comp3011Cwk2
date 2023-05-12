@@ -6,6 +6,7 @@ import json
 import re
 from pages.models import creditCard, billingDetails, transactions, Currencies
 from datetime import date
+from decimal import Decimal
 
 # Create your views here.
 
@@ -86,7 +87,9 @@ def paymentsPay(request):
             rAmount = requests.get(url+'/exchange/'+rCurrency+'/'+AmountPreConversion)
 
         #update users card balance
-        transactionCard.cardBalance -= rAmount
+        balanceToUpdate = Decimal(transactionCard.cardBalance) 
+        balanceToUpdate-= rAmount
+        transactionCard.cardBalance = balanceToUpdate
         transactionCard.save()
 
         #relevant data for bank api
@@ -154,7 +157,11 @@ def paymentsRefund(request):
             return JsonResponse("error : transaction made under different user")
         
         #Refund money to recip account
-        transactionCard.cardBalance += rTransactionDB.tAmount
+        balanceToUpdate = Decimal(transactionCard.cardBalance) 
+        balanceToUpdate += Decimal(rTransaction.tAmount)
+        transactionCard.cardBalance = balanceToUpdate
+        
+        transactionCard.save()
 
         currencyID = rTransactionDB.tCurrencyID
 
