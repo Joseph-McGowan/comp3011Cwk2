@@ -189,7 +189,7 @@ def paymentsRefund(request):
 
         rBillingDetails = transactionCard.cardBillingId
 
-        rTransactionDB = transactions.objects.get(id = rReservation)
+        rTransactionDB = transactions.objects.get(id = rTransaction)
 
         transactionUser = rTransactionDB.tUserId
 
