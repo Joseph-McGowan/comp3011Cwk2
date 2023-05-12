@@ -44,7 +44,7 @@ def paymentsPay(request):
             rAmount = transactionData.get("amount")
             rCurrency = transactionData.get("currency")
             rRecipAccount = transactionData.get("recipientAccount")
-            rReservationId = transactionData.get("reservationId")
+            rBookingId = transactionData.get("bookingId")
 
         except json.JSONDecodeError:
             return HttpResponseBadRequest("invalid json data")
@@ -102,7 +102,7 @@ def paymentsPay(request):
         transactionCard.save()
 
         #relevant data for bank api
-        data = {'transaction' : {'amount' : rAmount, 'currency' : rCurrency, 'recipientAccount' : rRecipAccount, 'reservationId' : rReservationId} }
+        data = {'transaction' : {'amount' : rAmount, 'companyName' : rRecipAccount, 'bookingId' : rBookingId} }
 
         #send post request to bank api to make paument to airline
         response = requests.post(url+'/pay', data= data)
