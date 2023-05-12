@@ -44,7 +44,7 @@ def paymentsPay(request):
             rAmount = transactionData.get("amount")
             rCurrency = transactionData.get("currency")
             rRecipAccount = transactionData.get("recipientAccount")
-            rBookingId = transactionData.get("bookingId")
+            rBookingId = transactionData.get("bookingID")
 
         except json.JSONDecodeError:
             return HttpResponseBadRequest("invalid json data")
@@ -60,15 +60,15 @@ def paymentsPay(request):
         emailRegEx = re.compile(r"[a-zA-Z0-9]+@[a-zA-Z0-9]+\.[a-z]+")
 
         if not(re.fullmatch(cardNumRegEx, requestCardNumber)):
-            return HttpResponseBadRequest('Malformed Card Number, payment failed', status = 405)
+            return JsonResponse('Malformed Card Number, payment failed', status = 405)
         if not(re.fullmatch(cvvRegEx, cvv)):
-            return HttpResponseBadRequest('Malformed CVV, payment failed', status = 405)
+            return  JsonResponse('Malformed CVV, payment failed', status = 405)
         if not(re.fullmatch(expiryDateRegEx, expiryDate)):
-            return HttpResponseBadRequest('Malformed Expiry Date, payment failed', status = 405)
+            return  JsonResponse('Malformed Expiry Date, payment failed', status = 405)
         if not(re.fullmatch(nameRegex, name)):
-            return HttpResponseBadRequest('Invalid Name, payment failed', status = 405)
+            return  JsonResponse('Invalid Name, payment failed', status = 405)
         if not(re.fullmatch(emailRegEx, email)):
-            return HttpResponseBadRequest('Inavlid email, payment failed', status = 405)
+            return  JsonResponse('Inavlid email, payment failed', status = 405)
 
         #query database for card matching form data
         
@@ -103,7 +103,7 @@ def paymentsPay(request):
         transactionCard.save()
 
         #relevant data for bank api
-        data = {'transaction' : {'amount' : rAmount, 'companyName' : rRecipAccount, 'bookingId' : rBookingId} }
+        data = {'transaction' : {'amount' : rAmount, 'companyName' : rRecipAccount, 'bookingID' : rBookingId} }
 
         #send post request to bank api to make paument to airline
         response = requests.post(url+'/pay', json= data)
