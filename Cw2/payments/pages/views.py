@@ -88,7 +88,7 @@ def paymentsPay(request):
 
         #update users card balance
         balanceToUpdate = Decimal(transactionCard.cardBalance) 
-        balanceToUpdate-= Decimal(rAmount)
+        balanceToUpdate-= float(rAmount)
         transactionCard.cardBalance = balanceToUpdate
         transactionCard.save()
 
@@ -158,7 +158,7 @@ def paymentsRefund(request):
         
         #Refund money to recip account
         balanceToUpdate = Decimal(transactionCard.cardBalance) 
-        balanceToUpdate += Decimal(rTransaction.tAmount)
+        balanceToUpdate +=  float(rTransaction.tAmount)
         transactionCard.cardBalance = balanceToUpdate
         
         transactionCard.save()
