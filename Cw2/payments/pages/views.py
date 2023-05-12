@@ -109,7 +109,7 @@ def paymentsPay(request):
         #json.dumps()
 
         #send post request to bank api to make paument to airline
-        response = requests.post(url+'/pay', data= data)
+        response = requests.post(url+'/pay', json= data)
 
 
         if response.status_code == 200:
