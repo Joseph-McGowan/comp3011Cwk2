@@ -139,7 +139,7 @@ def paymentsPay(request):
             }
             return JsonResponse(data)
 
-
+@csrf_exempt
 def paymentsRefund(request):
     if request.method == 'POST':
 
