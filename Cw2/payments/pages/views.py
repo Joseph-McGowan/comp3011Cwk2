@@ -164,11 +164,14 @@ def paymentsRefund(request):
             return HttpResponseBadRequest("invalid json data")
 
         #query database for card in request
-        transactionCard = creditCard.objects.get(cardNumber = requestCardNumber)
+       
         cardExists = creditCard.objects.filter(cardNumber = requestCardNumber).exists()
 
         if not(cardExists):
             return JsonResponse('status : failed', "message : card Doesn't exist")
+        
+        transactionCard = creditCard.objects.get(cardNumber = requestCardNumber)
+        
         
         #check other card details match
         if cvv != transactionCard.cardCVV:
