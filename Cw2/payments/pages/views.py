@@ -102,9 +102,9 @@ def paymentsPay(request):
                 rAmount = data.get("convertedAmount") 
 
             #check user has enough in acccount for transaction (inlcudind transaction fee)
-            if rAmount > balanceToUpdate:
-                data = {"status" : "failure"}
-                return JsonResponse(data)
+            #if rAmount > balanceToUpdate:
+             #   data = {"status" : "failure"}
+            #    return JsonResponse(data)
 
             #relevant data for bank api
             data = {'amount' : rAmount, 'companyName' : rRecipAccount, 'bookingID' : rBookingId}
