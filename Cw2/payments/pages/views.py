@@ -103,7 +103,8 @@ def paymentsPay(request):
         transactionCard.save()
 
         #relevant data for bank api
-        data = {'transaction' : {'amount' : rAmount, 'companyName' : rRecipAccount, 'bookingID' : rBookingId} }
+        data = {'amount' : rAmount, 'companyName' : rRecipAccount, 'bookingID' : rBookingId}
+        #json.dumps()
 
         #send post request to bank api to make paument to airline
         response = requests.post(url+'/pay', data= data)
