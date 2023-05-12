@@ -135,7 +135,7 @@ def paymentsPay(request):
             return JsonResponse('status : success', transaction.id )
 
         else:
-            return JsonResponse('status : failed')
+            return JsonResponse('status : failed', safe=False)
 
 
 def paymentsRefund(request):
