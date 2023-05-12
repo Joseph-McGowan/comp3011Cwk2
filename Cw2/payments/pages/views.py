@@ -117,7 +117,7 @@ def paymentsPay(request):
             #send email
             #Create a transaction
             transaction = transactions()
-            transaction.tUserId = tBillingDetails.userId
+            transaction.tUserId = tBillingDetails
             transaction.tDate = date.today()
             transaction.tAmount = rAmount
             transaction.tCurrencyID = rCurrency
