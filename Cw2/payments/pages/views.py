@@ -111,6 +111,7 @@ def paymentsPay(request):
         #send post request to bank api to make paument to airline
         response = requests.post(url+'/pay', json= data)
 
+        #tCurrency 
 
         if response.status_code == 200:
             #successful
@@ -120,7 +121,7 @@ def paymentsPay(request):
             transaction.tUserId = tBillingDetails
             transaction.tDate = date.today()
             transaction.tAmount = rAmount
-            transaction.tCurrencyID = 1
+            transaction.tCurrencyID = Currencies.objects.get(cSymbol = rCurrency)
             transaction.tTransactionFee = 50.00
             transaction.tConfirmed = True
             transaction.tRecipAccountId = rRecipAccount
