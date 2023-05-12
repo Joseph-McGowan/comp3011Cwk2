@@ -32,23 +32,23 @@ def paymentsPay(request):
        
         try:    
             payload = json.loads(request.body)
-            formData = payload.get('form')
-            transactionData = payload.get('transaction')
+            formData = payload.get("form")
+            transactionData = payload.get("transaction")
 
         except json.JSONDecodeError:
-            return HttpResponseBadRequest('invalid json data')
+            return HttpResponseBadRequest("invalid json data")
         #Parse request data
 
-        requestCardNumber = formData.get('cardNumber')
-        cvv = formData.get('cvv')
-        expiryDate = formData.get('expiryDate')
-        name = formData.get('name')
-        email = formData.get('email')
+        requestCardNumber = formData.get("cardNumber")
+        cvv = formData.get("cvv")
+        expiryDate = formData.get("expiryDate")
+        name = formData.get("name")
+        email = formData.get("email")
 
-        rAmount = transactionData.get('amount')
-        rCurrency = transactionData.get('currency')
-        rRecipAccount = transactionData.get('recipientAccount')
-        rReservationId = transactionData.get('reservationId')
+        rAmount = transactionData.get("amount")
+        rCurrency = transactionData.get("currency")
+        rRecipAccount = transactionData.get("recipientAccount")
+        rReservationId = transactionData.get("reservationId")
 
         #requestCardNumber = request.POST['cardNumber']
         #cvv = request.POST['cvv']
