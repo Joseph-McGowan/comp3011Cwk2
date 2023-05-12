@@ -127,7 +127,7 @@ def paymentsPay(request):
             transaction.tRecipAccountId = rRecipAccount
             transaction.save()
 
-            return JsonResponse('status : success',  + transaction.id, safe=False )
+            return JsonResponse('status : success'  + transaction.id, safe=False )
 
         else:
             return JsonResponse('status : failed', safe=False)
