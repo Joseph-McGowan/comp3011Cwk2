@@ -92,7 +92,9 @@ def paymentsPay(request):
         #check whether currency needs to be converted before making payment reqeust
         if transactionCard.cardCurrencyId != rCurrency:
             AmountPreConversion = rAmount
-            rAmount = requests.get(url+'/exchange/'+rCurrency+'/'+str(AmountPreConversion))
+            response = requests.get(url+'/exchange/'+rCurrency+'/'+str(AmountPreConversion))
+            data = response.json()
+            rAmount = data.get("convertedAmount") 
 
         #check user has enough in acccount for transaction (inlcudind transaction fee)
 
