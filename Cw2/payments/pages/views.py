@@ -30,18 +30,36 @@ def paymentsPay(request):
         for items in request.POST.items():
             print(items)
        
+        try:    
+            payload = json.loads(request.body)
+            formData = payload.get('form')
+            transactionData = payload.get('transaction')
+
+        except json.JSONDecodeError:
+            return HttpResponseBadRequest('invalid json data')
         #Parse request data
 
-        requestCardNumber = request.POST['cardNumber']
-        cvv = request.POST['cvv']
-        expiryDate = request.POST['expiryDate']
-        name = request.POST['name']
-        email = request.POST['email']
+        requestCardNumber = formData.get('cardNumber')
+        cvv = formData.get('cvv')
+        expiryDate = formData.get('expiryDate')
+        name = formData.get('name')
+        email = formData.get('email')
 
-        rAmount = request.POST.get('amount')
-        rCurrency = request.POST['currency']
-        rRecipAccount = request.POST['recipientAccount']
-        rReservationId = request.POST['reservationId']
+        rAmount = transactionData.get('amount')
+        rCurrency = transactionData.get('currency')
+        rRecipAccount = transactionData.get('recipientAccount')
+        rReservationId = transactionData.get('reservationId')
+
+        #requestCardNumber = request.POST['cardNumber']
+        #cvv = request.POST['cvv']
+        #expiryDate = request.POST['expiryDate']
+        #name = request.POST['name']
+        #email = request.POST['email']
+
+        #rAmount = request.POST.get('amount')
+        #rCurrency = request.POST['currency']
+        #rRecipAccount = request.POST['recipientAccount']
+        #rReservationId = request.POST['reservationId']
 
         #Check input data is formed correctly
 
