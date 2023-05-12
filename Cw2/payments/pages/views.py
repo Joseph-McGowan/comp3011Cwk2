@@ -106,7 +106,8 @@ def paymentsPay(request):
         data = {'transaction' : {'amount' : rAmount, 'companyName' : rRecipAccount, 'bookingID' : rBookingId} }
 
         #send post request to bank api to make paument to airline
-        response = requests.post(url+'/pay', json= data)
+        response = requests.post(url+'/pay', data= data)
+
 
         if response.status_code == 200:
             #successful
