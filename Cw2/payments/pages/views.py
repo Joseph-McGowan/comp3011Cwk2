@@ -50,6 +50,7 @@ def paymentsPay(request):
             return HttpResponseBadRequest("invalid json data")
         #Parse request data
 
+
         #Check input data is formed correctly
 
         cardNumRegEx = re.compile(r"[0-9]{16}")
@@ -89,9 +90,9 @@ def paymentsPay(request):
         tBillingDetails = transactionCard.cardBillingId
 
         #check whether currency needs to be converted before making payment reqeust
-        #if transactionCard.cardCurrencyId != rCurrency:
-         #   AmountPreConversion = rAmount
-          #  rAmount = requests.get(url+'/exchange/'+rCurrency+'/'+str(AmountPreConversion))
+        if transactionCard.cardCurrencyId != rCurrency:
+            AmountPreConversion = rAmount
+            rAmount = requests.get(url+'/exchange/'+rCurrency+'/'+str(AmountPreConversion))
 
         #check user has enough in acccount for transaction (inlcudind transaction fee)
 
@@ -105,7 +106,7 @@ def paymentsPay(request):
         data = {'transaction' : {'amount' : rAmount, 'companyName' : rRecipAccount, 'bookingId' : rBookingId} }
 
         #send post request to bank api to make paument to airline
-        response = requests.post(url+'/pay', data= data)
+        response = requests.post(url+'/pay', json= data)
 
         if response.status_code == 200:
             #successful
@@ -144,7 +145,8 @@ def paymentsRefund(request):
             email = formData.get("email")
 
             rTransaction = transactionData.get("transactionId")
-            rReservation = transactionData.get("reservationId")
+            rReservation = transactionData.get("bookingId")
+            #rCurrency = transactionData.get("currency")
 
         except json.JSONDecodeError:
             return HttpResponseBadRequest("invalid json data")
@@ -188,7 +190,7 @@ def paymentsRefund(request):
         
 
         #send refund post request to bank
-        response = requests.post(url+'/refund', data = data)
+        response = requests.post(url+'/refund', json = data)
 
         if response.status_code == 200:
             return JsonResponse('Status : success')
