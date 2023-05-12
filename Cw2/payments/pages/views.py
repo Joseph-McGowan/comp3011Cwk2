@@ -190,7 +190,7 @@ def paymentsRefund(request):
         
         #Refund money to recip account
         balanceToUpdate = Decimal(transactionCard.cardBalance) 
-        balanceToUpdate +=  float(rTransactionDB.tAmount)
+        balanceToUpdate +=  Decimal(rTransactionDB.tAmount)
         transactionCard.cardBalance = balanceToUpdate
         
         transactionCard.save()
