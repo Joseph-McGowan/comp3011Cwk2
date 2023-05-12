@@ -93,11 +93,11 @@ def paymentsPay(request):
         tBillingDetails = transactionCard.cardBillingId
 
         #check whether currency needs to be converted before making payment reqeust
-        #if transactionCard.cardCurrencyId != rCurrency:
-        #    AmountPreConversion = rAmount
-        #    response = requests.get(url+'/exchange/'+rCurrency+'/'+str(AmountPreConversion))
-        #    data = response.json()
-        #    rAmount = data.get("convertedAmount") 
+        if transactionCard.cardCurrencyId != rCurrency:
+            AmountPreConversion = rAmount
+            response = requests.get(url+'/exchange/'+rCurrency+'/'+str(AmountPreConversion))
+            data = response.json()
+            rAmount = data.get("convertedAmount") 
 
         #check user has enough in acccount for transaction (inlcudind transaction fee)
 
