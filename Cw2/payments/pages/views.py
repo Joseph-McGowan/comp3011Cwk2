@@ -32,7 +32,7 @@ def paymentsPay(request):
        
         try:    
             payload = json.loads(request.body)
-            formData = payload.get("form")
+            formData = payload.get("fields")
             transactionData = payload.get("transaction")
 
             requestCardNumber = formData.get("cardNumber")
