@@ -106,7 +106,7 @@ def paymentsPay(request):
 
         #update users card balance
         balanceToUpdate = Decimal(transactionCard.cardBalance) 
-        balanceToUpdate-= int(rAmount)
+        balanceToUpdate-= rAmount
         transactionCard.cardBalance = balanceToUpdate
         transactionCard.save()
 
