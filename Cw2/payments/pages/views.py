@@ -209,7 +209,7 @@ def paymentsRefund(request):
 
         #send refund post request to bank
         response = requests.post(url+'/refund', json = data)
-        return JsonResponse(response.json)
+        #return JsonResponse(response.json)
 
         if response.status_code == 200:
             data = {'status' : 'success'}
