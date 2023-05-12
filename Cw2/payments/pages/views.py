@@ -19,7 +19,7 @@ url = "https://sc19jt.pythonanywhere.com/bank"
 @csrf_exempt
 def paymentsForm(request):
     if request.method == "GET":
-        fields = {'fields':{'cardNumber' : '16 digit card number', 'cvv': '3 digit CVV', 'expiryDate' : 'MM/YY', 'name' : 'John', 'email' : 'johndoe@gmail.com'}}
+        fields = {'fields':{'cardNumber' : '16 digit card number', 'cvv': '3 digit CVV', 'expiryDate' : 'MM/YY', 'name' : 'first letter must be capitalised, e.g: Bob', 'email' : 'e.g : johndoe@gmail.com'}}
         return JsonResponse(fields)
 
 
@@ -106,7 +106,7 @@ def paymentsPay(request):
 
         #update users card balance
         balanceToUpdate = Decimal(transactionCard.cardBalance) 
-        balanceToUpdate-= float(rAmount)
+        balanceToUpdate-= int(rAmount)
         transactionCard.cardBalance = balanceToUpdate
         transactionCard.save()
 
