@@ -205,10 +205,11 @@ def paymentsRefund(request):
         response = requests.post(url+'/refund', json = data)
 
         if response.status_code == 200:
-            return JsonResponse('Status : success')
+            data = {'status' : 'success'}
+            return JsonResponse(data)
 
-
-        return JsonResponse('Status : error')
+        data = {'status' : 'failed'}
+        return JsonResponse(data)
 
 def paymentsBase(request):
     if request.method == 'GET':
