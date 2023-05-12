@@ -168,7 +168,8 @@ def paymentsRefund(request):
         cardExists = creditCard.objects.filter(cardNumber = requestCardNumber).exists()
 
         if not(cardExists):
-            return JsonResponse('status : failed', "message : card Doesn't exist")
+            data = {'status' : 'failed' }
+            return JsonResponse(data)
         
         transactionCard = creditCard.objects.get(cardNumber = requestCardNumber)
 
