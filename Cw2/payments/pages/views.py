@@ -64,7 +64,7 @@ def paymentsPay(request):
         #query database for card matching form data
         
         transactionCard = creditCard.objects.get(cardNumber = requestCardNumber)
-        cardExists = creditCard.objects.get(cardNumber = requestCardNumber).exists()
+        cardExists = creditCard.objects.filter(cardNumber = requestCardNumber).exists()
 
         if not(cardExists):
             return JsonResponse('status : failed', "message : card Doesn't exist")
@@ -130,7 +130,7 @@ def paymentsRefund(request):
 
         #query database for card in request
         transactionCard = creditCard.objects.get(cardNumber = requestCardNumber)
-        cardExists = creditCard.objects.get(cardNumber = requestCardNumber).exists()
+        cardExists = creditCard.objects.filter(cardNumber = requestCardNumber).exists()
 
         if not(cardExists):
             return JsonResponse('status : failed', "message : card Doesn't exist")
